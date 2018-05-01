@@ -28,9 +28,9 @@
 void rainbow()
 {
   // FastLED's built-in rainbow generator
-  fill_rainbow( leds, NUM_LEDS, gHue, speed);
+//  fill_rainbow( leds, NUM_LEDS, gHue, speed);
 }
-
+#if 0
 void addGlitter( fract8 chanceOfGlitter)
 {
   if ( random8() < chanceOfGlitter) {
@@ -251,6 +251,7 @@ void colorWaves()
 {
   colorwaves(leds, NUM_LEDS, currentPalette);
 }
+#endif
 
 typedef void (*Pattern)();
 typedef Pattern PatternList[];
@@ -261,6 +262,7 @@ typedef struct {
 typedef PatternAndName PatternAndNameList[];
 
 PatternAndNameList patterns = {
+#if 0
   { pride,                  "Pride" },
   { colorWaves,             "Color Waves" },
 
@@ -270,9 +272,10 @@ PatternAndNameList patterns = {
   // Fire & Water
   { fire, "Fire" },
   { water, "Water" },
-
+#endif
   // DemoReel100 patterns
   { rainbow, "rainbow" },
+#if 0
   { rainbowWithGlitter, "rainbowWithGlitter" },
   { confetti, "confetti" },
   { sinelon, "sinelon" },
@@ -280,6 +283,7 @@ PatternAndNameList patterns = {
   { bpm, "bpm" },
 
   { showSolidColor,         "Solid Color" },
+#endif
 };
 
 const uint8_t patternCount = ARRAY_SIZE(patterns);

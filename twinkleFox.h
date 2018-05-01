@@ -162,6 +162,7 @@ CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
 //  whichever is brighter.
 void drawTwinkles()
 {
+#if 0
   // "PRNG16" is the pseudorandom number generator
   // It MUST be reset to the same starting value each time
   // this function is called, so that the sequence of 'random'
@@ -226,4 +227,5 @@ void drawTwinkles()
       pixel = bg;
     }
   }
+  #endif
 }
