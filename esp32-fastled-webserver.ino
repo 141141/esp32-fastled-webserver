@@ -53,7 +53,6 @@ static uint16_t x;
 static uint16_t y;
 static uint16_t z;
 
-
 WebServer webServer(80);
 
 const int led = 5;
@@ -192,37 +191,33 @@ void loop()
 
   handleWeb();
 
-  if (power == 0) {
+  // if sketch uses swapBuffers(false), wait to get a new backBuffer() pointer after the swap is done:
+  while(backgroundLayer.isSwapPending());
 
-  }
-  else {
-    // if sketch uses swapBuffers(false), wait to get a new backBuffer() pointer after the swap is done:
-    while(backgroundLayer.isSwapPending());
+  rgb24 *buffer = backgroundLayer.backBuffer();
 
-    rgb24 *buffer = backgroundLayer.backBuffer();
+  static uint8_t ihue=0;
+  fillnoise8();
+  for(int i = 0; i < kMatrixWidth; i++) {
+    for(int j = 0; j < kMatrixHeight; j++) {
+      // We use the value at the (i,j) coordinate in the noise
+      // array for our brightness, and the flipped value from (j,i)
+      // for our pixel's hue.
+      buffer[kMatrixWidth*j + i] = CRGB(CHSV(noise[j][i],255,noise[i][j]));
 
-    static uint8_t ihue=0;
-    fillnoise8();
-    for(int i = 0; i < kMatrixWidth; i++) {
-      for(int j = 0; j < kMatrixHeight; j++) {
-        // We use the value at the (i,j) coordinate in the noise
-        // array for our brightness, and the flipped value from (j,i)
-        // for our pixel's hue.
-        buffer[kMatrixWidth*j + i] = CRGB(CHSV(noise[j][i],255,noise[i][j]));
-
-        // You can also explore other ways to constrain the hue used, like below
-        // buffer[kMatrixHeight*j + i] = CRGB(CHSV(ihue + (noise[j][i]>>2),255,noise[i][j]));
-      }
+      // You can also explore other ways to constrain the hue used, like below
+      // buffer[kMatrixHeight*j + i] = CRGB(CHSV(ihue + (noise[j][i]>>2),255,noise[i][j]));
     }
-    ihue+=1;
+  }
+  ihue+=1;
 
+  if(power) { 
     backgroundLayer.fillCircle(circlex % kMatrixWidth,circley % kMatrixHeight,6,CRGB(CHSV(ihue+128,255,255)));
     circlex += random16(2);
     circley += random16(2);
-
-    // buffer is filled completely each time, use swapBuffers without buffer copy to save CPU cycles
-    backgroundLayer.swapBuffers(false);
-    //matrix.countFPS();      // print the loop() frames per second to Serial
-
   }
+
+  // buffer is filled completely each time, use swapBuffers without buffer copy to save CPU cycles
+  backgroundLayer.swapBuffers(false);
+  //matrix.countFPS();      // print the loop() frames per second to Serial
 }
