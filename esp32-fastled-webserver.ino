@@ -153,7 +153,9 @@ void setup() {
 
   matrix.addLayer(&backgroundLayer); 
   matrix.addLayer(&scrollingLayer); 
-  matrix.begin();
+
+  // 10kB extra (DMA) RAM left over seems to be enough for the WiFi portion of the sketch to work (5kB was not enough)
+  matrix.begin(10*1024);
 
   backgroundLayer.setBrightness(128);
 
