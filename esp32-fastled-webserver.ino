@@ -22,6 +22,14 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+  This is an only partially functional port of the sketch to the SmartMatrix Library
+
+  Right now it just runs like the FastLED_Functions example, with "power" controlling the circle, and "speed" controlling the noise speed
+
+  It's released as of now as a bare minimum example of SmartMatrix Library working with WiFi and a web server
+*/
+
 #include <SmartMatrix3.h>
 #include <FastLED.h>
 #include <WiFi.h>

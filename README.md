@@ -3,6 +3,12 @@
 
 Control addressable LEDs with an ESP32 via a web browser over Wi-Fi.
 
+## Changes for SmartMatrix Library (Demo)
+
+- This is an only partially functional port of the sketch to the SmartMatrix Library
+- Right now it just runs like the FastLED_Functions example, with "power" controlling the circle, and "speed" controlling the noise speed
+- It's released as of now as a bare minimum example of SmartMatrix Library working with WiFi and a web server
+
 ## Features
 ### Currently Working:
 * [x] DemoReel100 patterns
