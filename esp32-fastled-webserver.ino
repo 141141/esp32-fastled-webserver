@@ -30,6 +30,8 @@
 #include <SPIFFS.h>
 #include <EEPROM.h>
 
+#define EXTRA_RAM_PRINTFS
+
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001008)
 #warning "Requires FastLED 3.1.8 or later; check github for latest code."
 #endif
@@ -143,19 +145,52 @@ void setup() {
   //  delay(3000); // 3 second delay for recovery
   Serial.begin(115200);
 
+#ifdef EXTRA_RAM_PRINTFS
+  printf("\r\n*** Start: \r\n");
+  printf("Heap Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(0), heap_caps_get_largest_free_block(0));
+  printf("8-bit Accessible Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_8BIT), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+  printf("32-bit Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_32BIT), heap_caps_get_largest_free_block(MALLOC_CAP_32BIT));
+  printf("DMA Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_DMA), heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
+#endif
+
   SPIFFS.begin();
   listDir(SPIFFS, "/", 1);
 
 //  loadFieldsFromEEPROM(fields, fieldCount);
 
+#ifdef EXTRA_RAM_PRINTFS
+  printf("\r\nSPIFFS: \r\n");
+  printf("Heap Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(0), heap_caps_get_largest_free_block(0));
+  printf("8-bit Accessible Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_8BIT), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+  printf("32-bit Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_32BIT), heap_caps_get_largest_free_block(MALLOC_CAP_32BIT));
+  printf("DMA Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_DMA), heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
+#endif
+
   setupWifi();
+
+#ifdef EXTRA_RAM_PRINTFS
+  printf("\r\nWiFi: \r\n");
+  printf("Heap Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(0), heap_caps_get_largest_free_block(0));
+  printf("8-bit Accessible Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_8BIT), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+  printf("32-bit Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_32BIT), heap_caps_get_largest_free_block(MALLOC_CAP_32BIT));
+  printf("DMA Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_DMA), heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
+#endif
+
   setupWeb();
+
+#ifdef EXTRA_RAM_PRINTFS
+  printf("\r\nWeb: \r\n");
+  printf("Heap Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(0), heap_caps_get_largest_free_block(0));
+  printf("8-bit Accessible Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_8BIT), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+  printf("32-bit Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_32BIT), heap_caps_get_largest_free_block(MALLOC_CAP_32BIT));
+  printf("DMA Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_DMA), heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
+#endif
 
   matrix.addLayer(&backgroundLayer); 
   matrix.addLayer(&scrollingLayer); 
 
-  // 10kB extra (DMA) RAM left over seems to be enough for the WiFi portion of the sketch to work (5kB was not enough)
-  matrix.begin(10*1024);
+  // 30kB extra (DMA) RAM left over seems to be enough for the WiFi+Web portion of the sketch to work (For 64x64/32 24-bit, 5kB was not enough to run, 10kB-20kB runs but fails when serving the webpage, 30kB worked with "Lowest 8-bit Accessible Memory Available: 4112" observed)
+  matrix.begin(30*1024);
 
   backgroundLayer.setBrightness(128);
 
@@ -171,7 +206,6 @@ void setup() {
   scrollingLayer.setFont(font6x10);
   scrollingLayer.start("SmartMatrix & FastLED", -1);
   scrollingLayer.setOffsetFromTop((kMatrixHeight/2) - 5);
-
 }
 
 // Fill the x/y array of 8-bit noise values using the inoise8 function.
@@ -222,4 +256,21 @@ void loop()
   // buffer is filled completely each time, use swapBuffers without buffer copy to save CPU cycles
   backgroundLayer.swapBuffers(false);
   //matrix.countFPS();      // print the loop() frames per second to Serial
+
+#ifdef EXTRA_RAM_PRINTFS
+  static unsigned long nextMillis = 0;
+  if(millis() > nextMillis) {
+    nextMillis = millis() + 10000;
+
+    printf("\r\nPeriodic: \r\n");
+    printf("Heap Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(0), heap_caps_get_largest_free_block(0));
+    printf("8-bit Accessible Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_8BIT), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+    printf("32-bit Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_32BIT), heap_caps_get_largest_free_block(MALLOC_CAP_32BIT));
+    printf("DMA Memory Available: %d bytes total, %d bytes largest free block: \r\n", heap_caps_get_free_size(MALLOC_CAP_DMA), heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
+    printf("Lowest Heap Memory Available: %d\r\n", heap_caps_get_minimum_free_size(0));
+    printf("Lowest 8-bit Accessible Memory Available: %d\r\n", heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT));
+    printf("Lowest 32-bit Memory Available: %d\r\n", heap_caps_get_minimum_free_size(MALLOC_CAP_32BIT));
+    printf("Lowest DMA Memory Available: %d\r\n", heap_caps_get_minimum_free_size(MALLOC_CAP_DMA));
+  }
+#endif
 }
